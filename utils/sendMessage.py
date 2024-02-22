@@ -25,4 +25,5 @@ def send_text(msg, chat_room):
     if result.returncode == 0:
         return True
     else:
-        return False
+        output = {'State': False, 'Error': result.stderr, 'Output': result.stdout}
+        return output
