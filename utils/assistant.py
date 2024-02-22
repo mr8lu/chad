@@ -1,6 +1,16 @@
 ''' assistant.py - Utilize OpenAI Assistant API '''
+from pathlib import Path
 from openai import OpenAI
+import configparser
 import json
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+config = configparser.ConfigParser()
+config_file = Path(f'{parent_dir}/config.ini')
+config.read(config_file)
+API_KEY = config.get('settings', 'API_KEY')
 
 
 def common_const():
@@ -45,6 +55,27 @@ def ofd():
     Pretend you are a sophisticated neoliberal. In the tone of Obama, be sarcastic and witty. response in text length.
     '''
     return prompt
+
+
+def default_assistant(API_KEY: str = API_KEY):
+    '''
+    This is create the default assistant Chad using GPT4-Turbo model
+    '''
+    MODEL = "gpt-4-turbo-preview"
+    client = OpenAI(api_key=API_KEY)
+    assistant = client.beta.assistants.create(
+        name="ChadGPT",
+        instruction=common_const(),
+        tools=[],
+        model=MODEL
+    )
+    return assistant
+
+
+def create_thread(API_KEY):
+    '''
+    This function creates a thread.
+    '''
 
 
 def gpt4(constraint, msg, API_KEY):
