@@ -8,7 +8,6 @@ import configparser
 from pathlib import Path
 from utils.sendMessage import send_text
 from utils.openai import (
-    gpt,
     spicy_gpt,
     funny_gpt,
     mario_gpt,
@@ -97,7 +96,6 @@ def main():
     validate_python()
     validate_dbfile()
     wal_checkpoint(chat_db)
-    persona = ['Spicy Latina', 'Funny Dad', 'Obama']
     last_msg = {}
     while True:
         guid = find_guid_by_display_name(chat_db, chat_room)
