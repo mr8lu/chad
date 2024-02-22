@@ -27,6 +27,7 @@ def dad_joke():
     try include simple, often predictable or pun-based joke;
     make it playfully embarrass or provoke a groan..
     '''
+    return prompt
 
 
 def mario():
@@ -34,6 +35,7 @@ def mario():
     prompt += '''\n
     Pretend that you support Palestine. be sarcastic and dry.
     '''
+    return prompt
 
 
 def ofd():
@@ -41,11 +43,10 @@ def ofd():
     prompt += '''\n
     Pretend you are a sophisticated neoliberal. In the tone of Obama, be sarcastic and witty. response in text length.
     '''
+    return prompt
 
 
 def gpt4(constraint, msg, API_KEY):
-    # model="gpt-3.5-turbo",
-    # MODEL = "gpt-4-turbo"
     MODEL = "gpt-4-turbo-preview"
     client = OpenAI(api_key=API_KEY)
     response = client.chat.completions.create(

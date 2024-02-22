@@ -54,7 +54,7 @@ def pull_latest_text_message(db, chat):
     FROM message
     JOIN chat_message_join ON message.ROWID = chat_message_join.message_id
     LEFT JOIN handle ON message.handle_id = handle.ROWID
-    WHERE chat_message_join.chat_id = (SELECT ROWID FROM chat WHERE guid = 'iMessage;+;chat705567039662392745')
+    WHERE chat_message_join.chat_id = (SELECT ROWID FROM chat WHERE guid = '{chat}')
     AND message.text LIKE '@chad%'
     ORDER BY message.date DESC
     LIMIT 1;
