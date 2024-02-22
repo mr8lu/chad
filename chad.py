@@ -96,7 +96,7 @@ def main():
     validate_python()
     validate_dbfile()
     wal_checkpoint(chat_db)
-    last_msg = {}
+    last_msg = None
     while True:
         guid = find_guid_by_display_name(chat_db, chat_room)
         msg = pull_latest_text_message(chat_db, guid)
