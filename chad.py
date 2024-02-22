@@ -7,7 +7,10 @@ import os
 import configparser
 from pathlib import Path
 from utils.sendMessage import send_text
-from utils.openai import gpt
+from utils.openai import (
+    gpt,
+    spicy_gpt
+)
 from utils.query import (
     find_guid_by_display_name,
     pull_latest_text_message,
@@ -115,15 +118,20 @@ def main():
 
             if msg['sender'] == 'self':
                 p = persona[2]
-            elif msg['sender'] == '+14075294686':
-                # Edd
-                p = persona[0]
+                response = gpt(p, text, API_KEY)
+
             elif msg['sender'] == '+13212761077':
                 # Marcella
                 p = persona[1]
+                response = gpt(p, text, API_KEY)
+
+            elif msg['sender'] == '+14075294686':
+                # Edd
+                response = spicy_gpt(text, API_KEY)
+
             else:
                 p = persona[2]
-            response = gpt(p, text, API_KEY)
+
             send_text(response, chat_room)
 
 
