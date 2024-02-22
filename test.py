@@ -1,6 +1,8 @@
 import subprocess
 
 
+msg = '''Oh, absolutely! It's like when you go to a family reunion expecting grandma's legendary pie, but all you get is store-bought cookies. I mean, Bell Labs was the cool science uncle of AT&T, bringing us transistor radios, lasers, and even helping us understand the cosmos. And now? Well, let's just say, it's like expecting an epic blockbuster movie and ending up with a straight-to-DVD sequel. Innovation nostalgia \u2013 it's a real thing!'''
+chat_room = 'Pasteurized EGG'
 def send_text(msg, chat_room):
     script = f'''
     tell application "Messages"
@@ -27,3 +29,5 @@ def send_text(msg, chat_room):
     else:
         output = {'State': False, 'Error': result.stderr, 'Output': result.stdout}
         return output
+
+send_text(msg, chat_room)

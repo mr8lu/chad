@@ -7,7 +7,12 @@ import os
 import configparser
 from pathlib import Path
 from utils.sendMessage import send_text
-from utils.openai import gpt
+from utils.openai import (
+    spicy_gpt,
+    funny_gpt,
+    mario_gpt,
+    chad_gpt
+)
 from utils.query import (
     find_guid_by_display_name,
     pull_latest_text_message,
@@ -91,8 +96,7 @@ def main():
     validate_python()
     validate_dbfile()
     wal_checkpoint(chat_db)
-    persona = ['Spicy Latina', 'Funny Dad', 'Obama']
-    last_msg = {}
+    last_msg = None
     while True:
         guid = find_guid_by_display_name(chat_db, chat_room)
         msg = pull_latest_text_message(chat_db, guid)
@@ -113,18 +117,31 @@ def main():
             last_msg = msg
             text = msg['text']
 
-            if msg['sender'] == 'self':
-                p = persona[2]
+            if msg['sender'] == '+13212761077':
+                # Marcella
+                response = funny_gpt(text, API_KEY)
+
             elif msg['sender'] == '+14075294686':
                 # Edd
-                p = persona[0]
-            elif msg['sender'] == '+13212761077':
-                # Marcella
-                p = persona[1]
+                response = spicy_gpt(text, API_KEY)
+
+            elif msg['sender'] == '+19416269361':
+                # Mario
+                response = mario_gpt(text, API_KEY)
+
             else:
-                p = persona[2]
-            response = gpt(p, text, API_KEY)
-            send_text(response, chat_room)
+                response = chad_gpt(text, API_KEY)
+
+            if debug_mode:
+                if not send_text(response, chat_room):
+                    error = send_text(response, chat_room)
+                    logger.error(error)
+                else:
+                    logger.info(response)
+            else:
+                if send_text(response, chat_room):
+                    logger.info(response)
+            
 
 
 if __name__ == "__main__":
