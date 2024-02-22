@@ -56,7 +56,7 @@ def gpt4(constraint, msg, API_KEY):
             {"role": "user", "content": msg}
         ],
         temperature=1.39,
-        max_tokens=256,
+        max_tokens=200,
         top_p=0.85,
         frequency_penalty=0.15,
         presence_penalty=0.08

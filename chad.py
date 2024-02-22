@@ -132,6 +132,7 @@ def main():
             else:
                 response = chad_gpt(text, API_KEY)
 
+            logger.info(response)
             send_text(response, chat_room)
 
 
