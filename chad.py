@@ -132,8 +132,15 @@ def main():
             else:
                 response = chad_gpt(text, API_KEY)
 
-            logger.info(response)
-            send_text(response, chat_room)
+            if debug_mode:
+                if not send_text(response, chat_room):
+                    logger.info(send_text(response, chat_room))
+                    logger.info(response)
+                    logger.info(chat_room)
+            else:
+                if send_text(response, chat_room):
+                    logger.info(response)
+            
 
 
 if __name__ == "__main__":
