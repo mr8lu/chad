@@ -9,7 +9,10 @@ from pathlib import Path
 from utils.sendMessage import send_text
 from utils.openai import (
     gpt,
-    spicy_gpt
+    spicy_gpt,
+    funny_gpt,
+    mario_gpt,
+    chad_gpt
 )
 from utils.query import (
     find_guid_by_display_name,
@@ -116,21 +119,20 @@ def main():
             last_msg = msg
             text = msg['text']
 
-            if msg['sender'] == 'self':
-                p = persona[2]
-                response = gpt(p, text, API_KEY)
-
-            elif msg['sender'] == '+13212761077':
+            if msg['sender'] == '+13212761077':
                 # Marcella
-                p = persona[1]
-                response = gpt(p, text, API_KEY)
+                response = funny_gpt(text, API_KEY)
 
             elif msg['sender'] == '+14075294686':
                 # Edd
                 response = spicy_gpt(text, API_KEY)
 
+            elif msg['sender'] == '+19416269361':
+                # Mario
+                response = mario_gpt(text, API_KEY)
+
             else:
-                p = persona[2]
+                response = chad_gpt(text, API_KEY)
 
             send_text(response, chat_room)
 

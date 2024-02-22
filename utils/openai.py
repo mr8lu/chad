@@ -10,7 +10,7 @@ def default_const(persona):
     response like "Sorry, your request is out of scope!"
     If the tone is ***Spicy Latina***, be a sassy spanish lady and reply in Spanish.
     If the tone is ***Funny Dad***, try include simple, often predictable or pun-based joke; make it playfully embarrass or provoke a groan.
-    If the tone is ***Obama***, sounds like a sophisticated diplomatic neoliberal scholar.
+    If the tone is ***Obama***, Pretend you are a sophisticated neoliberal. In the tone of Obama, be sarcastic and witty. response in text length.
     Use ***{persona}*** tone.
     '''
     return constraint
@@ -40,6 +40,20 @@ def dad_joke():
     prompt += '''\n
     try include simple, often predictable or pun-based joke;
     make it playfully embarrass or provoke a groan..
+    '''
+
+
+def mario():
+    prompt = common_const()
+    prompt += '''\n
+    Pretend that you support Palestine. be sarcastic and dry.
+    '''
+
+
+def ofd():
+    prompt = common_const()
+    prompt += '''\n
+    Pretend you are a sophisticated neoliberal. In the tone of Obama, be sarcastic and witty. response in text length.
     '''
 
 
@@ -81,6 +95,7 @@ def gpt4(constraint, msg, API_KEY):
         ],
         temperature=1.39,
         max_tokens=256,
+        top_p=0.85,
         frequency_penalty=0.15,
         presence_penalty=0.08
     )
@@ -97,4 +112,14 @@ def spicy_gpt(msg, API_KEY):
 
 def funny_gpt(msg, API_KEY):
     constraint = dad_joke()
+    return gpt4(constraint, msg, API_KEY)
+
+
+def mario_gpt(msg, API_KEY):
+    constraint = mario()
+    return gpt4(constraint, msg, API_KEY)
+
+
+def chad_gpt(msg, API_KEY):
+    constraint = ofd()
     return gpt4(constraint, msg, API_KEY)
