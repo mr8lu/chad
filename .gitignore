@@ -1,3 +1,8 @@
+# ignore swp
+**.swp
+# ignore config file
+**.ini
+**.db*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
