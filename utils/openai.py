@@ -1,3 +1,4 @@
+''' openai.py - OpenAI API '''
 from openai import OpenAI
 import json
 

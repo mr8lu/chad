@@ -1,4 +1,4 @@
-''' query.py '''
+''' query.py - sql query for chat.db '''
 from __future__ import annotations
 import sqlite3
 from datetime import datetime, timezone
