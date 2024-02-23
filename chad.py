@@ -65,7 +65,7 @@ class PasteurizedEgg:
 
     def ofd(self):
         # Assuming ofd is defined elsewhere or is a literal string
-        data = {'name': 'OFD', 'number': '+14042101792', 'instruction': ofd_persona()}
+        data = {'name': 'OFD', 'number': 'self', 'instruction': ofd_persona()}
         return data
 
 
@@ -140,7 +140,7 @@ class Bot:
         for msg in messages.data:
             if msg.role == 'assistant':
                 response = msg.content[0]
-                print(response.text)
+                logger.debug(response.text)
         return response.text
 
     def check_assistant_exist(self, name):
@@ -170,9 +170,10 @@ class Bot:
         logger.debug(f'Creating thread for {sender}')
         thread_metadata = {'number': sender}
         run = R.create_thread_and_run(aid, msg, t_metadata=thread_metadata)
-        tid = run['thread_id']
+        tid = run.id
         logger.debug('OpenAI Run', extra={'value': run})
         self.thread_dict[sender] = tid
+        logger.debug(f'add_thread function is good! Thread ID: {tid}')
         return run, tid
 
     def create_threads(self, aid, users):
@@ -204,10 +205,7 @@ def main():
     while True:
         guid = query.find_guid_by_display_name(chat_db, chat_room)
         msg = query.pull_latest_text_message(chat_db, guid)
-        logger.debug(msg)
-        logger.debug(last_msg)
 
-        logger.debug(chad)
         M = Message()
         R = Run()
         if msg == last_msg:
@@ -237,6 +235,7 @@ def main():
             logger.debug(run)
             response = R.get_run_messages(run)
             send_text(response, chat_room)
+            logger.debug(response)
             logger.info('======== SENT ======')
 
 
