@@ -235,7 +235,7 @@ def main():
                 response_data = M.get_messages_from_thread(tid, after=message.id, limit='20', order='desc')
                 response = chad.read_responses(response_data)
                 logger.debug(response)
-                # send_text(response, chat_room)
+                send_text(response, chat_room)
                 logger.info('======== SENT ======')
             else:
                 logger.debug('OpenAI Run has failed!')
