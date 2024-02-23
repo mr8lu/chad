@@ -7,17 +7,7 @@ import os
 import configparser
 from pathlib import Path
 from utils.sendMessage import send_text
-from utils.openai import (
-    spicy_gpt,
-    funny_gpt,
-    mario_gpt,
-    chad_gpt
-)
-from utils.query import (
-    find_guid_by_display_name,
-    pull_latest_text_message,
-    wal_checkpoint
-)
+from utils import query
 import logging
 import json
 import time
@@ -67,6 +57,28 @@ if debug_mode:
     logger.addHandler(file_handler)
 
 
+class PasteurizedEgg:
+    def edd(self):
+        data = {'name': 'Edd Siu',
+                'number': '+14075294686'}
+        return data
+
+    def marcella(self):
+        data = {'name': 'Marcella Grillo',
+                'number': '+13212761077'}
+        return data
+
+    def mario(self):
+        data = {'name': 'Mario Massad',
+                'number': '+19416269361'}
+        return data
+
+    def ofd(self):
+        data = {'name': 'OFD',
+                'number': ['+14042101792', 'self']}
+        return data
+
+
 def validate_python():
     return sys.version_info >= (3, 10)
 
@@ -91,55 +103,54 @@ def validate_dbfile():
         copy_db()
 
 
+def last_message():
+    data = {}
+    lm = Path(f'{current_dir}/.cache')
+    if not os.path.exists(lm):
+        with open(lm, 'w') as f:
+            f.write(json.dumps(data))
+    else:
+        with open(lm, 'r') as f:
+            data = f.read()
+    data = json.loads(data)
+    return data
+
+
+class Bot:
+    def __init__(self, name):
+        from openai.assistants import Assistant
+        # check if Bot/Assistant exists
+        exists, aid = self.check_assistant_exist(name)
+        if not exists:
+            # create assistant if needed
+            self.assistant = Assistant.create_default_assistant()
+        else:
+            self.assistant = Assistant.get_assistant(aid)
+
+    def check_assistant_exist(self, name):
+        assistants = self.a.list_assistants()
+        assistants = assistants['data']
+        a_list = []
+        for assistant in assistants:
+            name = assistant['name']
+            aid = assistant['id']
+            item = {name: aid}
+            a_list.append(item)
+        for key, value in a_list:
+            if key == name:
+                return True, value
+        return False
+
+
 def main():
     validate_python()
     validate_dbfile()
-    wal_checkpoint(chat_db)
+    query.wal_checkpoint(chat_db)
+    # need to replace this with a file
     last_msg = None
     while True:
-        guid = find_guid_by_display_name(chat_db, chat_room)
-        msg = pull_latest_text_message(chat_db, guid)
-        if debug_mode:
-            logger.info(f'GUID: {guid}')
-        if msg == last_msg:
-            if debug_mode:
-                logger.info('No new messages. Refreshing...')
-                logger.info('Sleep for 5s..')
-            copy_db()
-            wal_checkpoint(chat_db)
-            time.sleep(5)
-        else:
-            if debug_mode:
-                logger.info('New Messages found!')
-                logger.info(guid)
-                logger.info(msg)
-            last_msg = msg
-            text = msg['text']
-
-            if msg['sender'] == '+13212761077':
-                # Marcella
-                response = funny_gpt(text, API_KEY)
-
-            elif msg['sender'] == '+14075294686':
-                # Edd
-                response = spicy_gpt(text, API_KEY)
-
-            elif msg['sender'] == '+19416269361':
-                # Mario
-                response = mario_gpt(text, API_KEY)
-
-            else:
-                response = chad_gpt(text, API_KEY)
-
-            if debug_mode:
-                if not send_text(response, chat_room):
-                    error = send_text(response, chat_room)
-                    logger.error(error)
-                else:
-                    logger.info(response)
-            else:
-                if send_text(response, chat_room):
-                    logger.info(response)
+        guid = find_guid
+        chad = Bot('ChadGPT')
 
 
 if __name__ == "__main__":
