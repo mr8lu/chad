@@ -1,4 +1,4 @@
-''' thread.py - OpenAI Assistant Thread '''
+''' messages.py - OpenAI Thread Messages '''
 
 
 from pathlib import Path
@@ -7,7 +7,7 @@ import configparser
 import os
 
 
-class Thread:
+class Message:
     def __init__(self):
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.parent_dir = os.path.dirname(self.current_dir)
@@ -17,21 +17,21 @@ class Thread:
         self.API_KEY = self.config.get('settings', 'API_KEY')
         self.client = OpenAI(api_key=self.API_KEY)
 
-    def create_thread(self):
-        empty_thread = self.client.beta.threads.create()
-        return empty_thread
-
-    def get_thread(self, tid: str):
-        thread = self.client.beta.threads.retrieve(tid)
-        return thread
-
-    def update_thread(self, tid: str, metadata):
-        thread = self.client.beta.threads.update(
+    def create_message(self, tid, role, msg):
+        m = self.client.beta.threads.messages.create(
             tid,
-            metadata=metadata
+            role=role,
+            content=msg
         )
-        return thread
+        return m
 
-    def delete_thread(self, tid: str):
-        r = self.client.beta.threads.delete(tid)
-        return r
+    def get_messages_from_thread(self, tid: str):
+        m = self.client.beta.threads.messages.list(tid)
+        return m
+
+    def get_message(self, tid: str, mid: str):
+        m = self.client.beta.threads.messages.retrieve(
+            message_id=mid,
+            thread_id=tid
+        )
+        return m
