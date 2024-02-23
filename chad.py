@@ -113,10 +113,13 @@ class Bot:
     def __init__(self, name, chat_room):
         # check if Bot/Assistant exists
         logger.debug(f'Initialize ChatBot: Check if assistant {name} exist for {chat_room}', extra={'class': 'Bot'})
-        exists, self.aid = self.check_assistant_exist(name)
+        self.aid = ''
+        exists = self.check_assistant_exist(name)
+        print(self.aid)
         a = Assistant()
         if not exists:
             assistant = a.create_default_assistant()
+            time.sleep(15)
         else:
             assistant = a.get_assistant(self.aid)
         egg = PasteurizedEgg()
@@ -132,14 +135,13 @@ class Bot:
             logger.debug(self.thread_dict)
 
     def read_responses(self, messages):
-        response = ''
+        logger.debug('==== read response ====')
+        logger.debug(messages)
         for msg in messages.data:
             if msg.role == 'assistant':
-                content = msg.content
-                for m in content:
-                    response = m.text.value
-                    print(response)
-        return response
+                response = msg.content[0]
+                print(response.text)
+        return response.text
 
     def check_assistant_exist(self, name):
         logger.debug('Check assistants...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
@@ -155,10 +157,11 @@ class Bot:
                 aid = assistant.id
                 logger.info('Listing assistants...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
                 if assistant_name == name:
-                    return True, aid
+                    self.aid = aid
+                    return True
         else:
             logger.warning(f'Assistant {name} does not exist, creating...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
-            return False, None
+            return False
 
     def add_thread(self, sender, msg, aid):
         '''
@@ -222,27 +225,19 @@ def main():
                 tid = chad.thread_dict[sender].id
                 # debug
                 text = 'How are you?'
-                message = M.create_message(tid, text)
+                m = M.create_message(tid, text)
+                logger.debug('======= Create MESSAGE ======')
+                logger.debug(m)
                 prompt = chad.user_instructions[sender]
                 run = R.create_run(tid, chad.aid, instructions=prompt)
             else:
                 run, tid = chad.add_thread(sender, text, chad.aid)
-                message = M.get_messages_from_thread(tid)
 
-            logger.debug('DEBUG:  RUN and RUN ID')
+            logger.debug('DEBUG: Created RUN')
             logger.debug(run)
-            run_id = run.id
-            finish, run = R.get_run(tid, run_id)
-            if finish:
-                logger.debug('OpenAI Run has finished!', extra={'usage': run.usage})
-                response_data = M.get_messages_from_thread(tid, after=message.id, limit='20', order='desc')
-                response = chad.read_responses(response_data)
-                logger.debug(response_data)
-                print(response)
-                # send_text(response, chat_room)
-                logger.info('======== SENT ======')
-            else:
-                logger.debug('OpenAI Run has failed!')
+            response = R.get_run_messages(run)
+            send_text(response, chat_room)
+            logger.info('======== SENT ======')
 
 
 if __name__ == "__main__":

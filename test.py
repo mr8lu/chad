@@ -35,9 +35,20 @@ def send_text(msg, chat_room):
 
 def test():
     from OpenAIAssistant.assistants import Assistant
+    from OpenAIAssistant.threads import Thread
+    from OpenAIAssistant.runs import Run
+    from OpenAIAssistant.messages import Message
     A = Assistant()
+    T = Thread()
+    R = Run()
+    M = Message()
     data = A.list_assistants(limit='10', order='desc')
+    rs = A.client.beta.threads.runs.steps.list(
+        thread_id='thread_99zTxAOUzfAgHVmQiLqJtv0U',
+        run_id='run_UB8smFEksP04W8FzNkoFaIDa',
+    )
     print(data)
+    print(rs.data[0].step_details)
 
 
 test()
