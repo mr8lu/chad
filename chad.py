@@ -137,7 +137,8 @@ class Bot:
             if msg.role == 'assistant':
                 content = msg.content
                 for m in content:
-                    response += m.text.value + ' '
+                    response = m.text.value
+                    print(response)
         return response
 
     def check_assistant_exist(self, name):
@@ -219,6 +220,8 @@ def main():
 
             if sender in chad.numbers:
                 tid = chad.thread_dict[sender].id
+                # debug
+                text = 'How are you?'
                 message = M.create_message(tid, text)
                 prompt = chad.user_instructions[sender]
                 run = R.create_run(tid, chad.aid, instructions=prompt)
@@ -234,8 +237,9 @@ def main():
                 logger.debug('OpenAI Run has finished!', extra={'usage': run.usage})
                 response_data = M.get_messages_from_thread(tid, after=message.id, limit='20', order='desc')
                 response = chad.read_responses(response_data)
-                logger.debug(response)
-                send_text(response, chat_room)
+                logger.debug(response_data)
+                print(response)
+                # send_text(response, chat_room)
                 logger.info('======== SENT ======')
             else:
                 logger.debug('OpenAI Run has failed!')
