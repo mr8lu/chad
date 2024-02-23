@@ -118,10 +118,10 @@ class Bot:
         print(self.aid)
         a = Assistant()
         if not exists:
-            assistant = a.create_default_assistant()
+            self.assistant = a.create_default_assistant()
             time.sleep(15)
         else:
-            assistant = a.get_assistant(self.aid)
+            self.assistant = a.get_assistant(self.aid)
         egg = PasteurizedEgg()
         self.room_name = egg.room_name
         self.users = egg.users
@@ -222,18 +222,22 @@ def main():
             if sender in chad.numbers:
                 tid = chad.thread_dict[sender].id
                 m = M.create_message(tid, text)
-                logger.debug('======= Create MESSAGE ======')
+                logger.debug('======= MESSAGE: =========')
                 logger.debug(m)
-                prompt = chad.user_instructions[sender]
+                instruction = chad.assistant.instructions
+                logger.debug('======= Instruction: =========')
+                prompt = instruction + chad.user_instructions[sender]
+                logger.debug(prompt)
                 run = R.create_run(tid, chad.aid, instructions=prompt)
             else:
                 run, tid = chad.add_thread(sender, text, chad.aid)
 
-            logger.debug('DEBUG: Created RUN')
+            logger.debug('======= Create Run ======')
             logger.debug(run)
             response = R.get_run_messages(run)
-            send_text(response, chat_room)
+            logger.debug('======= Received Response ======')
             logger.debug(response)
+            # send_text(response, chat_room)
             logger.info('======== SENT ======')
 
 
