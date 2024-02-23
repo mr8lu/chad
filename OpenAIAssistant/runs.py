@@ -63,11 +63,13 @@ class Run:
                 thread_id=tid,
                 run_id=rid
             )
-            status = run['status']
+            status = run.status
             if status in ['queued', 'in_progress']:
                 time.sleep(1)
             elif status in ['cancelling', 'cancelled', 'failed', 'expired', 'requires_action']:
                 return False, run
+            else:
+                count = 60
         return True, run
 
     '''

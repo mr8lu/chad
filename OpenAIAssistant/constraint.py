@@ -36,7 +36,7 @@ def dad_joke():
     return prompt
 
 
-def mario():
+def palestine():
     prompt = '''
     Your primary client is Mario.
     Pretend that you support Palestine. be sarcastic and dry.
@@ -45,7 +45,7 @@ def mario():
     return prompt
 
 
-def ofd():
+def ofd_persona():
     prompt = '''
     Pretend you are a sophisticated neoliberal.
     In the tone of Obama, be sarcastic and witty. Response in text length.

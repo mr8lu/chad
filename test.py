@@ -33,3 +33,11 @@ def send_text(msg, chat_room):
 # send_text(msg, chat_room)
 
 
+def test():
+    from OpenAIAssistant.assistants import Assistant
+    A = Assistant()
+    data = A.list_assistants(limit='10', order='desc')
+    print(data)
+
+
+test()

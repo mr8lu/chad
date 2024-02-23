@@ -11,15 +11,15 @@ from pathlib import Path
 from utils import query
 from utils.sendMessage import send_text
 from utils.logging_config import configure_logging
-from openai.runs import Run
-from openai.threads import Thread
-from openai.messages import Message
-from openai.assistants import Assistant
-from openai.constraint import (
+from OpenAIAssistant.runs import Run
+from OpenAIAssistant.threads import Thread
+from OpenAIAssistant.messages import Message
+from OpenAIAssistant.assistants import Assistant
+from OpenAIAssistant.constraint import (
     spicy_latina,
     dad_joke,
-    mario,
-    ofd
+    palestine,
+    ofd_persona
 )
 
 
@@ -37,41 +37,35 @@ logger = configure_logging(debug_mode, log_file)
 
 class PasteurizedEgg:
     def __init__(self):
-        room_name = 'Pasteurized EGG'
-        users = [self.edd,
-                 self.marcella,
-                 self.mario,
-                 self.ofd]
-        numbers = []
-        instructions = {}
-        for n in users:
+        self.room_name = 'Pasteurized EGG'
+        # Call each method to get user data
+        self.users = [self.edd(), self.marcella(), self.mario(), self.ofd()]
+        self.numbers = []
+        self.instructions = {}
+
+        for n in self.users:
             number = n['number']
-            numbers.append(number)
-            instructions[number] = n['instruction']
-        return room_name, users, numbers, instructions
+            self.numbers.append(number)
+            self.instructions[number] = n['instruction']
 
     def edd(self):
-        data = {'name': 'Edd Siu',
-                'number': '+14075294686',
-                'instruction': spicy_latina}
+        # Assuming spicy_latina is defined elsewhere or is a literal string
+        data = {'name': 'Edd Siu', 'number': '+14075294686', 'instruction': spicy_latina()}
         return data
 
     def marcella(self):
-        data = {'name': 'Marcella Grillo',
-                'number': '+13212761077',
-                'instruction': dad_joke}
+        # Assuming dad_joke is defined elsewhere or is a literal string
+        data = {'name': 'Marcella Grillo', 'number': '+13212761077', 'instruction': dad_joke()}
         return data
 
     def mario(self):
-        data = {'name': 'Mario Massad',
-                'number': '+19416269361',
-                'instruction': mario}
+        # Assuming mario is defined elsewhere or is a literal string
+        data = {'name': 'Mario Massad', 'number': '+19416269361', 'instruction': palestine()}
         return data
 
     def ofd(self):
-        data = {'name': 'OFD',
-                'number': '+14042101792',
-                'instruction': ofd}
+        # Assuming ofd is defined elsewhere or is a literal string
+        data = {'name': 'OFD', 'number': '+14042101792', 'instruction': ofd_persona()}
         return data
 
 
@@ -85,10 +79,9 @@ def copy_db():
     wal_prod = Path(f'{chat_db}-wal')
     shm = Path(f'{original_chat_db}-shm')
     shm_prod = Path(f'{chat_db}-shm')
-    if debug_mode:
-        logger.info(f'Copying {original_chat_db} to {chat_db}...')
-        logger.info(f'Copying {wal} to {wal_prod}...')
-        logger.info(f'Copying {shm} to {shm_prod}...')
+    logger.debug(f'Copying {original_chat_db} to {chat_db}...')
+    logger.debug(f'Copying {wal} to {wal_prod}...')
+    logger.debug(f'Copying {shm} to {shm_prod}...')
     shutil.copyfile(wal, wal_prod)
     shutil.copyfile(original_chat_db, chat_db)
     shutil.copyfile(shm, shm_prod)
@@ -97,84 +90,82 @@ def copy_db():
 def validate_dbfile():
     if not os.path.exists(chat_db):
         copy_db()
-        logger.info('Copying chat.db')
-    else:
-        logger.info('chat.db found!')
     return True
 
 
 def read_last_message():
-    logger.info('Check if cache exist')
-    data = {}
     lm = Path(f'{current_dir}/.cache')
-    if not os.path.exists(lm):
-        logger.debug('cache not exist, create cache', extra={'function': 'read_last_message'})
-        with open(lm, 'w') as f:
-            f.write(json.dumps(data))
-    else:
-        logger.debug('cache exist', extra={'function': 'read_last_message'})
-        with open(lm, 'r') as f:
-            data = f.read()
-    data = json.loads(data)
-    logger.debug(data)
-    return data
+    try:
+        with open(lm, "r") as file:
+            data = json.load(file)
+            return data["last_msg"]
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
 
 
 def write_last_message(msg):
     lm = Path(f'{current_dir}/.cache')
-    data = json.dumps(msg)
-    with open(lm, 'w') as f:
-        f.write(data)
-    logger.info('Write latest message to cache')
-    return True, data
+    with open(lm, "w") as file:
+        json.dump(msg, file)
 
 
 class Bot:
     def __init__(self, name, chat_room):
         # check if Bot/Assistant exists
-        logger.info(f'Check if assistant {name} exist for {chat_room}', extra={'class': 'Bot'})
-        exists, aid = self.check_assistant_exist(name)
+        logger.debug(f'Initialize ChatBot: Check if assistant {name} exist for {chat_room}', extra={'class': 'Bot'})
+        exists, self.aid = self.check_assistant_exist(name)
+        a = Assistant()
         if not exists:
-            self.assistant = Assistant.create_default_assistant()
+            assistant = a.create_default_assistant()
         else:
-            self.assistant = Assistant.get_assistant(aid)
-        self.room_name, self.users, self.numbers, self.user_instructions = PasteurizedEgg()
+            assistant = a.get_assistant(self.aid)
+        egg = PasteurizedEgg()
+        self.room_name = egg.room_name
+        self.users = egg.users
+        self.numbers = egg.numbers
+        self.user_instructions = egg.instructions
         if chat_room == self.room_name:
             '''
             thread_dict example: {'+13213211234': 'thread_id'}
             '''
-            self.thread_dict = self.create_threads(aid, self.users)
-        logger.info('Loading contacts', extra={'class': 'Bot'})
-        return aid
+            self.thread_dict = self.create_threads(self.aid, self.users)
+            logger.debug(self.thread_dict)
 
     def read_responses(self, messages):
         response = ''
-        for msg in messages['data']:
-            if msg['role'] == 'assistant':
-                content = msg['content']
+        for msg in messages.data:
+            if msg.role == 'assistant':
+                content = msg.content
                 for m in content:
-                    response += m['text']['value'] + ' '
+                    response += m.text.value + ' '
         return response
 
     def check_assistant_exist(self, name):
-        logger.info('Listing assistants...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
-        assistants = self.a.list_assistants()
-        assistants = assistants['data']
-        for assistant in assistants:
-            assistant_name = assistant['name']
-            aid = assistant['id']
-            if assistant_name == name:
+        logger.debug('Check assistants...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
+        A = Assistant()
+        try:
+            assistants = A.list_assistants(order='desc', limit=10)
+            logger.debug(assistants)
+        except TypeError as e:
+            logger.error(e)
+        if assistants.data:
+            for assistant in assistants.data:
+                assistant_name = assistant.name
+                aid = assistant.id
                 logger.info('Listing assistants...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
-                return True, aid
-                logger.info(f'Assistant {name} does not exist, creating...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
-        return False, None
+                if assistant_name == name:
+                    return True, aid
+        else:
+            logger.warning(f'Assistant {name} does not exist, creating...', extra={'class': 'Bot', 'function': 'check_assistant_exist'})
+            return False, None
 
     def add_thread(self, sender, msg, aid):
         '''
         '''
-        logger.info(f'Creating thread for {sender}')
+        R = Run()
+        logger.debug(f'Creating thread for {sender}')
         thread_metadata = {'number': sender}
-        run = Run.create_thread_and_run(aid, msg, t_metadata=thread_metadata)
+        run = R.create_thread_and_run(aid, msg, t_metadata=thread_metadata)
         tid = run['thread_id']
         logger.debug('OpenAI Run', extra={'value': run})
         self.thread_dict[sender] = tid
@@ -184,11 +175,12 @@ class Bot:
         '''return
         {'+13210004444': 'thread_id'}
         '''
-        logger.info('Initialize threads for users..')
+        logger.debug('Initialize threads for users..')
         tids = {}
+        T = Thread()
         for user in users:
             number = user['number']
-            tid = Thread.create_thread(metadata=user)
+            tid = T.create_thread(metadata=user)
             tids[number] = tid
         logger.debug('Users', extra={'value': users})
         logger.debug('Thread IDs', extra={'value': tid})
@@ -197,45 +189,56 @@ class Bot:
 
 def main():
     if validate_python():
-        logger.info('Python3 >= 3.10', extra={'function': 'main'})
+        logger.debug('Python3 >= 3.10', extra={'function': 'main'})
     if validate_dbfile():
-        logger.info('Python Version is good.', extra={'function': 'main'})
+        logger.debug('Python Version is good.', extra={'function': 'main'})
     query.wal_checkpoint(chat_db)
     logger.info('Chat.db checkpointing...')
-    # need to replace this with a file
-    last_msg = read_last_message()
+    # last_msg = read_last_message()
+    last_msg = {}
+    chad = Bot('ChadGPT', chat_room)
     while True:
         guid = query.find_guid_by_display_name(chat_db, chat_room)
         msg = query.pull_latest_text_message(chat_db, guid)
-        chad = Bot('ChadGPT', chat_room)
+        logger.debug(msg)
+        logger.debug(last_msg)
+
+        logger.debug(chad)
+        M = Message()
+        R = Run()
         if msg == last_msg:
+            logger.info('======== No new messages found ======')
             time.sleep(5)
             copy_db()
             query.wal_checkpoint(chat_db)
         else:
-            write_last_message(msg)
+            logger.info('======== Submitting new messages ======')
+            last_msg = msg
             text = msg['text']
             sender = msg['sender']
 
-        if sender in chad.numbers:
-            tid = chad.thread_dict[sender]
-            message = Message.create_message(tid, text)
-            prompt = chad.user_instructions[sender]
-            run = Run.create_run(tid, chad, instructions=prompt)
-        else:
-            run, tid = chad.add_thread(sender, text, chad)
-            message = Message.get_messages_from_thread(tid)
+            if sender in chad.numbers:
+                tid = chad.thread_dict[sender].id
+                message = M.create_message(tid, text)
+                prompt = chad.user_instructions[sender]
+                run = R.create_run(tid, chad.aid, instructions=prompt)
+            else:
+                run, tid = chad.add_thread(sender, text, chad.aid)
+                message = M.get_messages_from_thread(tid)
 
-        run_id = run['id']
-        finish, run = Run.get_run(tid, run_id)
-        if finish:
-            logger.debug('OpenAI Run has finished!', extra={'usage': run['usage']})
-            response_data = Message.get_messages_from_thread(tid, after=message['id'])
-            response = chad.read_responses(response_data)
-            logger.info(response)
-            # send_text(response, chat_room)
-        else:
-            logger.debug('OpenAI Run has failed!')
+            logger.debug('DEBUG:  RUN and RUN ID')
+            logger.debug(run)
+            run_id = run.id
+            finish, run = R.get_run(tid, run_id)
+            if finish:
+                logger.debug('OpenAI Run has finished!', extra={'usage': run.usage})
+                response_data = M.get_messages_from_thread(tid, after=message.id, limit='20', order='desc')
+                response = chad.read_responses(response_data)
+                logger.debug(response)
+                # send_text(response, chat_room)
+                logger.info('======== SENT ======')
+            else:
+                logger.debug('OpenAI Run has failed!')
 
 
 if __name__ == "__main__":
