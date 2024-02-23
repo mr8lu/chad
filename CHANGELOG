@@ -8,10 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]  - v1
 ### Added
-#### Features
+#### Assistant Features 
+- Classes: Assistant, Thread, Message, Run
 
 #### Documentation
 - `utils/*.py`: comments/descriptions
+
+### Changed
+- Update Constraints
+- Update OpenAI `client` invocation
 
 ### Fixed
 
