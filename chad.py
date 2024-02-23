@@ -221,8 +221,6 @@ def main():
 
             if sender in chad.numbers:
                 tid = chad.thread_dict[sender].id
-                # debug
-                text = 'How are you?'
                 m = M.create_message(tid, text)
                 logger.debug('======= Create MESSAGE ======')
                 logger.debug(m)
