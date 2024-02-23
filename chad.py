@@ -16,6 +16,7 @@ from OpenAIAssistant.threads import Thread
 from OpenAIAssistant.messages import Message
 from OpenAIAssistant.assistants import Assistant
 from OpenAIAssistant.constraint import (
+    welcome_msg,
     spicy_latina,
     dad_joke,
     palestine,
@@ -215,9 +216,12 @@ def main():
             query.wal_checkpoint(chat_db)
         else:
             logger.info('======== Submitting new messages ======')
-            last_msg = msg
-            text = msg['text']
+            if last_msg == {}:
+                text = welcome_msg()
+            else:
+                text = msg['text']
             sender = msg['sender']
+            last_msg = msg
 
             if sender in chad.numbers:
                 tid = chad.thread_dict[sender].id
