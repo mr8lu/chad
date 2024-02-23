@@ -17,8 +17,10 @@ class Thread:
         self.API_KEY = self.config.get('settings', 'API_KEY')
         self.client = OpenAI(api_key=self.API_KEY)
 
-    def create_thread(self):
-        empty_thread = self.client.beta.threads.create()
+    def create_thread(self, msg=[], metadata={}):
+        empty_thread = self.client.beta.threads.create(
+            metadata=metadata
+        )
         return empty_thread
 
     def get_thread(self, tid: str):

@@ -17,7 +17,7 @@ class Message:
         self.API_KEY = self.config.get('settings', 'API_KEY')
         self.client = OpenAI(api_key=self.API_KEY)
 
-    def create_message(self, tid, role, msg):
+    def create_message(self, tid, msg, role='user'):
         m = self.client.beta.threads.messages.create(
             tid,
             role=role,
@@ -25,8 +25,14 @@ class Message:
         )
         return m
 
-    def get_messages_from_thread(self, tid: str):
-        m = self.client.beta.threads.messages.list(tid)
+    def get_messages_from_thread(self, tid: str, limit: int, order: str, after: str = None, before: str = None):
+        m = self.client.beta.threads.messages.list(
+            tid,
+            limit=limit,
+            order=order,
+            after=after,
+            before=before
+        )
         return m
 
     def get_message(self, tid: str, mid: str):

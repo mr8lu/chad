@@ -5,6 +5,7 @@ from pathlib import Path
 from openai import OpenAI
 import configparser
 import os
+import time
 
 
 class Run:
@@ -29,17 +30,17 @@ class Run:
         )
         return run
 
-    def create_thread_and_run(self, aid, role, msg, t_metadata={}, model: str = None, instructions: str = None, tools=None, metadata={}):
+    def create_thread_and_run(self, aid, msg, role='user', t_metadata={}, model: str = None, instructions: str = None, tools=None, metadata={}):
         run = self.client.beta.threads.create_and_run(
             assistant_id=aid,
             thread={
                 "messages": [
                     {
                         "role": role,
-                        "content": msg,
-                        "metadata": t_metadata
+                        "content": msg
                     }
-                ]
+                ],
+                "metadata": t_metadata
             },
             metadata=metadata
         )
@@ -56,11 +57,18 @@ class Run:
         return runs
 
     def get_run(self, tid, rid):
-        run = self.client.beta.threads.runs.retrieve(
-            thread_id=tid,
-            run_id=rid
-        )
-        return run
+        count = 0
+        while count < 60:
+            run = self.client.beta.threads.runs.retrieve(
+                thread_id=tid,
+                run_id=rid
+            )
+            status = run['status']
+            if status in ['queued', 'in_progress']:
+                time.sleep(1)
+            elif status in ['cancelling', 'cancelled', 'failed', 'expired', 'requires_action']:
+                return False, run
+        return True, run
 
     '''
     I think this is still in beta and the document isn't clear to me.
