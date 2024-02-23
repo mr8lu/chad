@@ -7,7 +7,7 @@ def send_text(msg, chat_room):
     tell application "Messages"
     set chatFound to false
     set chatNameToFind to "{chat_room}"
-    set myMessage to 'Chad: {msg}'
+    set myMessage to "Chad: {msg}"
 
     repeat with aChat in every chat
         if name of aChat is chatNameToFind then
