@@ -32,7 +32,7 @@ chat_db = config.get('settings', 'chat_db')
 chat_db = Path(f'{current_dir}/{chat_db}').expanduser()
 API_KEY = config.get('settings', 'API_KEY')
 welcome_message = config.get('settings', 'welcome_message')
-welcome_mode = config.get('settings', 'welcome_mode')
+welcome_mode = config.getboolean('settings', 'welcome_mode')
 debug_mode = config.getboolean('settings', 'debug_mode')
 log_file = config.get('settings', 'log_file')
 logger = configure_logging(debug_mode, log_file)
@@ -224,16 +224,16 @@ def main():
             logger.info('======== No new messages found ======')
         else:
             if last_msg == None and init_msg == 0:
-                logger.info('======== Welcome messages ======')
-                text = welcome_msg(welcome_message)
-                sender = 'general'
+                init_msg += 1
                 if welcome_mode == True:
+                    logger.info('======== Welcome messages ======')
+                    text = welcome_msg(welcome_message)
+                    sender = 'general'
                     wrun, tid = chad.add_thread(sender, text, chad.aid)
                     response = R.get_run_messages(wrun)
                     send_text(response, chat_room)
+                    logger.debug(response)
                     logger.info('======== SENT Welcome messages ======')
-                init_msg += 1
-
             else:
                 logger.info('======== Submitting new messages ======')
                 text = msg['text']
