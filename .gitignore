@@ -1,3 +1,5 @@
+# ignore logs
+**.log*
 # ignore swp
 **.swp
 # ignore config file

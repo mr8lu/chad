@@ -1,3 +1,4 @@
+''' sendMessage.py - Send iMessage via Message App on macOS '''
 import subprocess
 
 
