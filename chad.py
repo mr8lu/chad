@@ -238,18 +238,20 @@ def main():
                 logger.info('======== Submitting new messages ======')
                 text = msg['text']
                 sender = msg['sender']
-                last_msg = msg
 
                 if sender in chad.numbers:
-                    tid = chad.thread_dict[sender].id
-                    m = M.create_message(tid, text)
+                    try:
+                        tid = chad.thread_dict[sender].id
+                        m = M.create_message(tid, text)
+                        instruction = chad.assistant.instructions
+                        prompt = instruction + chad.user_instructions[sender]
+                        run = R.create_run(tid, chad.aid, instructions=prompt)
+                        logger.debug(prompt)
+                    except KeyError:
+                        run, tid = chad.add_thread(sender, text, chad.aid)
                     logger.debug('======= MESSAGE: =========')
-                    logger.debug(m)
-                    instruction = chad.assistant.instructions
+                    logger.debug(text)
                     logger.debug('======= Instruction: =========')
-                    prompt = instruction + chad.user_instructions[sender]
-                    logger.debug(prompt)
-                    run = R.create_run(tid, chad.aid, instructions=prompt)
                 else:
                     run, tid = chad.add_thread(sender, text, chad.aid)
 
@@ -260,6 +262,8 @@ def main():
                 logger.debug(response)
                 send_text(response, chat_room)
                 logger.info('======== SENT ======')
+                init_msg += 1
+                last_msg = msg
 
 
 if __name__ == "__main__":
