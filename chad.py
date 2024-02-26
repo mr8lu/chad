@@ -31,6 +31,7 @@ chat_room = config.get('settings', 'chat_room')
 chat_db = config.get('settings', 'chat_db')
 chat_db = Path(f'{current_dir}/{chat_db}').expanduser()
 API_KEY = config.get('settings', 'API_KEY')
+welcome_message = config.get('settings', 'welcome_message')
 debug_mode = config.getboolean('settings', 'debug_mode')
 log_file = config.get('settings', 'log_file')
 logger = configure_logging(debug_mode, log_file)
@@ -133,7 +134,9 @@ class Bot:
             thread_dict example: {'+13213211234': 'thread_id'}
             '''
             self.thread_dict = self.create_threads(self.aid, self.users)
-            logger.debug(self.thread_dict)
+        else:
+            self.thread_dict = {}
+        logger.debug(self.thread_dict)
 
     def read_responses(self, messages):
         logger.debug('==== read response ====')
@@ -201,45 +204,55 @@ def main():
     query.wal_checkpoint(chat_db)
     logger.info('Chat.db checkpointing...')
     # last_msg = read_last_message()
-    last_msg = {}
+    last_msg = None
+    init_msg = 0
     chad = Bot('ChadGPT', chat_room)
+    M = Message()
+    R = Run()
     while True:
         guid = query.find_guid_by_display_name(chat_db, chat_room)
         msg = query.pull_latest_text_message(chat_db, guid)
+        logger.debug('======= New Loop ==========')
+        logger.info(msg)
+        logger.info(init_msg)
 
-        M = Message()
-        R = Run()
-        if msg == last_msg:
-            logger.info('======== No new messages found ======')
+        if msg == last_msg and init_msg != 0:
             time.sleep(5)
             copy_db()
             query.wal_checkpoint(chat_db)
+            logger.info('======== No new messages found ======')
         else:
-            logger.info('======== Submitting new messages ======')
-            if last_msg == {}:
-                text = welcome_msg()
-            else:
-                text = msg['text']
-            sender = msg['sender']
-            last_msg = msg
-
-            if sender in chad.numbers:
-                tid = chad.thread_dict[sender].id
-                m = M.create_message(tid, text)
-                logger.debug('======= MESSAGE: =========')
-                logger.debug(m)
-                instruction = chad.assistant.instructions
-                logger.debug('======= Instruction: =========')
-                prompt = instruction + chad.user_instructions[sender]
-                logger.debug(prompt)
-                run = R.create_run(tid, chad.aid, instructions=prompt)
-            else:
+            if last_msg == None and init_msg == 0:
+                logger.info('======== Welcome messages ======')
+                text = welcome_msg(welcome_message)
+                sender = 'general'
+                init_msg += 1
                 run, tid = chad.add_thread(sender, text, chad.aid)
+            else:
+                logger.info('======== Submitting new messages ======')
+                text = msg['text']
+                sender = msg['sender']
+                last_msg = msg
+
+                if sender in chad.numbers:
+                    tid = chad.thread_dict[sender].id
+                    m = M.create_message(tid, text)
+                    logger.debug('======= MESSAGE: =========')
+                    logger.debug(m)
+                    instruction = chad.assistant.instructions
+                    logger.debug('======= Instruction: =========')
+                    prompt = instruction + chad.user_instructions[sender]
+                    logger.debug(prompt)
+                    run = R.create_run(tid, chad.aid, instructions=prompt)
+                else:
+                    run, tid = chad.add_thread(sender, text, chad.aid)
 
             logger.debug('======= Create Run ======')
             logger.debug(run)
             response = R.get_run_messages(run)
             logger.debug('======= Received Response ======')
+            M = Message()
+            R = Run()
             logger.debug(response)
             # send_text(response, chat_room)
             logger.info('======== SENT ======')
