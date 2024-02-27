@@ -34,6 +34,7 @@ API_KEY = config.get('settings', 'API_KEY')
 welcome_message = config.get('settings', 'welcome_message')
 welcome_mode = config.getboolean('settings', 'welcome_mode')
 debug_mode = config.getboolean('settings', 'debug_mode')
+quiet_mode = config.getboolean('settings', 'quiet_launch')
 log_file = config.get('settings', 'log_file')
 logger = configure_logging(debug_mode, log_file)
 
@@ -231,8 +232,11 @@ def main():
                     sender = 'general'
                     wrun, tid = chad.add_thread(sender, text, chad.aid)
                     response = R.get_run_messages(wrun)
-                    send_text(response, chat_room)
+                    logger.debug('========= DEBUG RESOSNE =======')
                     logger.debug(response)
+                    send_text(response, chat_room)
+                    logger.info('======== SENT ======')
+
                     logger.info('======== SENT Welcome messages ======')
             else:
                 logger.info('======== Submitting new messages ======')
@@ -260,8 +264,11 @@ def main():
                 response = R.get_run_messages(run)
                 logger.debug('======= Received Response ======')
                 logger.debug(response)
-                send_text(response, chat_room)
-                logger.info('======== SENT ======')
+                if quiet_mode and init_msg == 0:
+                    logger.info('======== First Message BYPASS ======')
+                else:
+                    send_text(response, chat_room)
+                    logger.info('======== SENT ======')
                 init_msg += 1
                 last_msg = msg
 
