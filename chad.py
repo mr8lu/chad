@@ -225,7 +225,6 @@ def main():
             logger.info('======== No new messages found ======')
         else:
             if last_msg == None and init_msg == 0:
-                init_msg += 1
                 if welcome_mode == True:
                     logger.info('======== Welcome messages ======')
                     text = welcome_msg(welcome_message)
@@ -264,13 +263,13 @@ def main():
                 response = R.get_run_messages(run)
                 logger.debug('======= Received Response ======')
                 logger.debug(response)
-                if quiet_mode and init_msg == 0:
+                if quiet_mode == True and init_msg == 0:
                     logger.info('======== First Message BYPASS ======')
                 else:
                     send_text(response, chat_room)
                     logger.info('======== SENT ======')
-                init_msg += 1
                 last_msg = msg
+            init_msg = 1
 
 
 if __name__ == "__main__":

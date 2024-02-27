@@ -3,6 +3,7 @@ import subprocess
 
 
 def send_text(msg, chat_room):
+    msg = msg.replace('"', "'")
     script = f'''
     tell application "Messages"
     set chatFound to false
