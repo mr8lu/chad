@@ -17,8 +17,8 @@ Chad is designed to provide a ChatGPT-like experience within iMessage, integrati
 
 Before you install Chad, ensure you have the following:
 
-- Python version 3.10 or higher.
-- OpenAI library version 1.12.0 or higher.
+- Python version `3.10` or higher.
+- OpenAI library version `1.12.0` or higher.
 
 ## Installation
 
@@ -27,7 +27,9 @@ Before you install Chad, ensure you have the following:
    Ensure you have Python 3.10 or higher installed. Then, install the required Python libraries using pip:
 
    ```bash
-   pip install openai>=1.12.0```
+   pip install openai>=1.12.0
+	```   
+
 2. Replace `[Your iMessage Chat Name]` and `[Your-API-Key-here]` with your actual iMessage chat name and OpenAI API key, respectively.
 
 
