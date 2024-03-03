@@ -17,6 +17,7 @@ Chad is designed to provide a ChatGPT-like experience within iMessage, integrati
 
 Before you install Chad, ensure you have the following:
 
+- macOS with Messages app signed into your iCloud account.
 - Python version `3.10` or higher.
 - OpenAI library version `1.12.0` or higher.
 
