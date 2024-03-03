@@ -31,3 +31,6 @@ welcome_message =
 
 API_KEY = [Your-API-Key-here]
 ```
+
+## LICENSE
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
