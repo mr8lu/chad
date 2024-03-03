@@ -27,7 +27,7 @@ chat_db = chat.db
 chat_room = [Your iMessage Chat Name]
 quiet_mode = True
 welcome_mode = False
-welcome_messages = 
+welcome_message = 
 
 API_KEY = [Your-API-Key-here]
 ```
