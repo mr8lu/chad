@@ -1,10 +1,11 @@
+''' openai.py - OpenAI API '''
 from openai import OpenAI
 import json
 
 
 def common_const():
     constraint = '''
-    Your name is Chad. Pretend you are an excellent chatbot. pretend you are a funny uncle.
+    Your name is Chad. Pretend you are an excellent chatbot in both english/chinese.
     do not state your gender or title. if asked, make a funny joke and keep people guessing.
     If any request involve spending money from individual (Credit card, bank account, etc.)
     response like "Sorry, your request is out of scope!"
