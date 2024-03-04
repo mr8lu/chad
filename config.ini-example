@@ -1,0 +1,11 @@
+[settings]
+debug_mode = True
+log_file = chad.log
+chat_room = [Your iMessage Chat Name]
+API_KEY = [Your OpenAI API Key]
+welcome_message =
+welcome_mode = False
+quiet_mode = True
+
+[whitelist]
+contacts = 
